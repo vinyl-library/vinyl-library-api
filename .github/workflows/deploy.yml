@@ -36,6 +36,7 @@ jobs:
             DATABASE_URL=${{ secrets.DATABASE_URL }}
 
   deploy:
+    needs: publish
     runs-on: ubuntu-latest
     steps:
       - name: Pull image and run container
