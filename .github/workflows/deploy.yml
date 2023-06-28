@@ -30,7 +30,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${IMAGE_NAME}
           build-args: |
             PORT=${{ env.PORT }}
             DATABASE_URL=${{ secrets.DATABASE_URL }}
