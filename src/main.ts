@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { PrismaService } from './prisma/prisma.service';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, Logger } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
@@ -13,7 +13,8 @@ async function bootstrap() {
   await prismaService.enableShutdownHooks(app);
   const PORT = process.env.PORT || 3001;
   await app.listen(PORT);
-  console.log('Listening on port ' + PORT);
-  console.log(await app.getUrl());
+
+  const logger = new Logger('Main');
+  logger.log(`Listening on port ${PORT}: ${await app.getUrl()}`);
 }
 bootstrap();
