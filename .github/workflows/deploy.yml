@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: main
 
+env:
+  CONTAINER_NAME: vinyl
+  IMAGE_NAME: vinyl-api
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -26,7 +30,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/vinyl-api
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/$IMAGE_NAME
           build-args: |
             PORT=${{ env.PORT }}
             DATABASE_URL=${{ secrets.DATABASE_URL }}
@@ -36,10 +40,15 @@ jobs:
     steps:
       - name: Pull image and run container
         uses: appleboy/ssh-action@v0.1.10
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
         with:
           host: ${{ secrets.GCP_HOST }}
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           key: ${{ secrets.GCP_KEY }}
-        script: |
-          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/vinyl-api
-          docker run -d -p 80:80 --name vinyl -e JWT_SECRET=${{ secrets.JWT_SECRET }} ${{ secrets.DOCKERHUB_USERNAME }}/vinyl-api
+          envs: DOCKERHUB_USERNAME,JWT_SECRET,CONTAINER_NAME,IMAGE_NAME
+          script: |
+            docker container rm -f $CONTAINER_NAME
+            docker image rm -f $DOCKERHUB_USERNAME/$IMAGE_NAME
+            docker run -d -p 80:80 --name $CONTAINER_NAME -e JWT_SECRET=$JWT_SECRET $DOCKERHUB_USERNAME/$IMAGE_NAME
