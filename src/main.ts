@@ -11,6 +11,9 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   const prismaService = app.get(PrismaService);
   await prismaService.enableShutdownHooks(app);
-  await app.listen(process.env.PORT || 3001);
+  const PORT = process.env.PORT || 3001;
+  await app.listen(PORT);
+  console.log('Listening on port ' + PORT);
+  console.log(await app.getUrl());
 }
 bootstrap();

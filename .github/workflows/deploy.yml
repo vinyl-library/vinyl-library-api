@@ -50,6 +50,6 @@ jobs:
           key: ${{ secrets.GCP_KEY }}
           envs: DOCKERHUB_USERNAME,JWT_SECRET,CONTAINER_NAME,IMAGE_NAME
           script: |
-            docker container rm -f $CONTAINER_NAME
-            docker image rm -f $DOCKERHUB_USERNAME/$IMAGE_NAME
+            docker container rm -f $CONTAINER_NAME || true
+            docker image rm -f $DOCKERHUB_USERNAME/$IMAGE_NAME || true
             docker run -d -p 80:80 --name $CONTAINER_NAME -e JWT_SECRET=$JWT_SECRET $DOCKERHUB_USERNAME/$IMAGE_NAME
