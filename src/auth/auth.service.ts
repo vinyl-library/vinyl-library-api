@@ -21,7 +21,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new BadRequestException({ message: 'Username not found' });
+      throw new UnauthorizedException({ message: 'Username not found' });
     }
 
     if (compareSync(password, user.password)) {

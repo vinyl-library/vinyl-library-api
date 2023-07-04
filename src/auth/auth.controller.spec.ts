@@ -1,20 +1,86 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { LoginRequestDto } from './dto/LoginRequest.dto';
+import { Response } from 'express';
+import { RegisterRequestDto } from './dto/RegisterRequest.dto';
 
 describe('AuthController', () => {
-  let controller: AuthController;
+  let authController: AuthController;
+
+  const authServiceMock = {
+    login: jest.fn(),
+    register: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
-      providers: [AuthService],
+      providers: [
+        {
+          provide: AuthService,
+          useValue: authServiceMock,
+        },
+      ],
     }).compile();
 
-    controller = module.get<AuthController>(AuthController);
+    authController = module.get<AuthController>(AuthController);
   });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
+  describe('login', () => {
+    it('should set JWT cookie and return success message', async () => {
+      // setup
+      const loginRequestDto: LoginRequestDto = {
+        username: 'username',
+        password: 'password',
+      };
+
+      const TOKEN = 'generated token';
+
+      const responseMock: Partial<Response> = {
+        cookie: jest.fn(),
+      };
+
+      const successMessage = {
+        message: 'Successfully logged in',
+      };
+
+      authServiceMock.login.mockResolvedValue(TOKEN);
+
+      // act
+      const result = await authController.login(
+        loginRequestDto,
+        responseMock as Response,
+      );
+
+      // assert
+      expect(result).toEqual(successMessage);
+      expect(responseMock.cookie).toHaveBeenCalledWith('jwt', TOKEN, {
+        httpOnly: true,
+      });
+      expect(authServiceMock.login).toHaveBeenCalledWith(loginRequestDto);
+    });
+  });
+
+  describe('register', () => {
+    it('should return success message', async () => {
+      // setup
+      const registerRequestDto: RegisterRequestDto = {
+        username: 'username',
+        name: 'name',
+        password: 'password',
+      };
+
+      const successMessage = {
+        message: 'Successfully registered',
+      };
+
+      // act
+      const result = await authController.register(registerRequestDto);
+
+      // assert
+      expect(result).toEqual(successMessage);
+      expect(authServiceMock.register).toHaveBeenCalledWith(registerRequestDto);
+    });
   });
 });
