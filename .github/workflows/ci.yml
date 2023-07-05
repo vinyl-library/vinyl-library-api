@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -20,6 +21,8 @@ jobs:
         run: yarn
       - name: Migrate database
         run: yarn migrate:dev
+      - name: Generate Prisma Client
+        run: yarn prisma generate
       - name: Run tests
         run: yarn test:ci
       - name: Run e2e tests
