@@ -3,11 +3,11 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { LoginRequestDto } from './dto/LoginRequest.dto';
 import { RegisterRequestDto } from './dto/RegisterRequest.dto';
 import { JwtService } from '@nestjs/jwt';
 import { compareSync, hashSync } from 'bcrypt';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
@@ -21,7 +21,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new BadRequestException({ message: 'Username not found' });
+      throw new UnauthorizedException({ message: 'Username not found' });
     }
 
     if (compareSync(password, user.password)) {
