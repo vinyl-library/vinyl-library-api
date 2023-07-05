@@ -1,18 +1,34 @@
 name: Deploy
 
 on:
-  push:
-    branches: main
-  pull_request:
-    branches: main
+  - push
+  - pull_request
 
 env:
   CONTAINER_NAME: vinyl
   IMAGE_NAME: vinyl-api
 
 jobs:
-  publish:
+  test:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install modules
+        run: yarn
+      - name: Migrate database
+        run: yarn migrate:dev
+      - name: Run tests
+        run: yarn test:ci
+      - name: Run e2e tests
+        run: yarn test:e2e:ci
+
+  publish:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -38,6 +54,7 @@ jobs:
   deploy:
     needs: publish
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Pull image and run container
         uses: appleboy/ssh-action@v0.1.10
