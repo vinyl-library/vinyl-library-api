@@ -11,44 +11,53 @@ datasource db {
 }
 
 model User {
-    id       String @id @default(uuid())
-    username String @unique
-    name     String
-    password String
-    loans    Loan[]
+    id            String  @id @default(uuid())
+    username      String  @unique
+    name          String
+    password      String
+    fine          Int     @default(0)
+    loans         Loan[]
+    wishlist      Book[]
+    favoriteGenre Genre[]
 }
 
 model Book {
-    id        String  @id @default(uuid())
-    title     String
-    author    String
-    publisher String
-    pages     Int
-    stock     Int
-    shelfId   String?
-    shelf     Shelf?  @relation(fields: [shelfId], references: [id])
-    genre     Genre[]
-    loans     Loan[]
+    id           String  @id @default(uuid())
+    title        String
+    author       String
+    description  String
+    coverUrl     String?
+    pages        Int
+    stock        Int
+    rating       Float
+    genre        Genre[]
+    loans        Loan[]
+    wishlistedBy User[]
 }
 
 model Genre {
-    id    String @id @default(uuid())
-    name  String
-    books Book[]
-}
-
-model Shelf {
-    id       String @id @default(uuid())
-    name     String
-    capacity Int
-    books    Book[]
+    id          String @id @default(uuid())
+    name        String
+    books       Book[]
+    favoritedBy User[]
 }
 
 model Loan {
-    id         String    @id @default(uuid())
-    createdAt  DateTime  @default(now())
-    returnDate DateTime?
-    userId     String
-    user       User      @relation(fields: [userId], references: [id])
-    books      Book[]
+    id            String     @id
+    createdAt     DateTime   @default(now())
+    activeDate    DateTime?
+    endDate       DateTime?
+    returnDate    DateTime?
+    timesExtended Int        @default(0)
+    rejectMessage String?
+    loanStatus    LoanStatus @default(WAITING_FOR_VERIFICATION)
+    userId        String
+    user          User       @relation(fields: [userId], references: [id])
+    books         Book[]
+}
+
+enum LoanStatus {
+    WAITING_FOR_VERIFICATION
+    REJECTED
+    ACCEPTED
 }
