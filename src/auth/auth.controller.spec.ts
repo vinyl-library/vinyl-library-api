@@ -69,6 +69,7 @@ describe('AuthController', () => {
         username: 'username',
         name: 'name',
         password: 'password',
+        favoriteGenre: ['genre'],
       };
 
       const successMessage = {
