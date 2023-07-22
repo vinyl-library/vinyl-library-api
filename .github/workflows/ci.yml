@@ -2,7 +2,6 @@ name: Test and Deploy
 
 on:
   - push
-  - pull_request
 
 env:
   CONTAINER_NAME: vinyl
