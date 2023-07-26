@@ -7,12 +7,12 @@ export class AppController {
 
   @IsPublic()
   @Get()
-  getHello(): string {
-    return 'Hello World!';
+  getHello() {
+    return { message: 'Hello World!' };
   }
 
   @Get('/protected')
-  getProtected(): string {
-    return 'Authenticated!';
+  getProtected() {
+    return { message: 'Authenticated!' };
   }
 }
