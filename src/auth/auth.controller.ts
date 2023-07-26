@@ -40,4 +40,14 @@ export class AuthController {
       message: 'Successfully registered',
     };
   }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('/logout')
+  async logout(@Res({ passthrough: true }) response: Response) {
+    response.clearCookie('jwt', { httpOnly: true });
+
+    return {
+      message: 'Successfully logged out',
+    };
+  }
 }
