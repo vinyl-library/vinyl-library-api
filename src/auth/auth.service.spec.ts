@@ -15,6 +15,9 @@ describe('AuthService', () => {
       findFirst: jest.fn(),
       create: jest.fn(),
     },
+    genre: {
+      findMany: jest.fn(),
+    },
   };
   const jwtServiceMock = {
     sign: jest.fn(),
@@ -112,6 +115,7 @@ describe('AuthService', () => {
       username: 'username',
       name: 'name',
       password: 'password',
+      favoriteGenre: ['genre'],
     };
 
     it('should create new user if success', async () => {
@@ -120,6 +124,8 @@ describe('AuthService', () => {
       const ENCRYPTED_PASSWORD = 'encrypted password';
 
       prismaServiceMock.user.findFirst.mockResolvedValue(null);
+      prismaServiceMock.genre.findMany.mockResolvedValue([{ id: 'genre' }]);
+
       jest.spyOn(bcrypt, 'hashSync').mockReturnValue(ENCRYPTED_PASSWORD);
 
       // act
@@ -131,6 +137,11 @@ describe('AuthService', () => {
           username: registerRequestDto.username,
         },
       });
+      expect(prismaServiceMock.genre.findMany).toBeCalledWith({
+        where: {
+          id: { in: registerRequestDto.favoriteGenre },
+        },
+      });
       expect(bcrypt.hashSync).toBeCalledWith(
         registerRequestDto.password,
         SALT_ROUNDS,
@@ -140,6 +151,11 @@ describe('AuthService', () => {
           username: registerRequestDto.username,
           name: registerRequestDto.name,
           password: ENCRYPTED_PASSWORD,
+          favoriteGenre: {
+            connect: registerRequestDto.favoriteGenre.map((id) => {
+              return { id };
+            }),
+          },
         },
       });
     });
@@ -158,6 +174,27 @@ describe('AuthService', () => {
       expect(prismaServiceMock.user.findFirst).toBeCalledWith({
         where: {
           username: registerRequestDto.username,
+        },
+      });
+    });
+
+    it('should throw Bad Request Exception if genre not found', async () => {
+      // setup
+      prismaServiceMock.user.findFirst.mockResolvedValue(null);
+      prismaServiceMock.genre.findMany.mockResolvedValue([]);
+
+      // act and assert
+      await expect(authService.register(registerRequestDto)).rejects.toThrow(
+        BadRequestException,
+      );
+      expect(prismaServiceMock.user.findFirst).toBeCalledWith({
+        where: {
+          username: registerRequestDto.username,
+        },
+      });
+      expect(prismaServiceMock.genre.findMany).toBeCalledWith({
+        where: {
+          id: { in: registerRequestDto.favoriteGenre },
         },
       });
     });

@@ -1,8 +1,7 @@
-name: Deploy
+name: Test and Deploy
 
 on:
   - push
-  - pull_request
 
 env:
   CONTAINER_NAME: vinyl
@@ -19,7 +18,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Install modules
         run: yarn
-      - name: Migrate database
+      - name: Migrate test database
         run: yarn migrate:dev
       - name: Generate Prisma Client
         run: yarn prisma generate

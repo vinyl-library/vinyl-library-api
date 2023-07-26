@@ -32,7 +32,12 @@ export class AuthService {
     }
   }
 
-  async register({ username, name, password }: RegisterRequestDto) {
+  async register({
+    username,
+    name,
+    password,
+    favoriteGenre,
+  }: RegisterRequestDto) {
     const user = await this.prisma.user.findFirst({
       where: {
         username,
@@ -43,10 +48,36 @@ export class AuthService {
       throw new BadRequestException({ message: 'Username already taken' });
     }
 
+    const genreFound = (
+      await this.prisma.genre.findMany({
+        where: {
+          id: {
+            in: favoriteGenre,
+          },
+        },
+      })
+    ).map((genre) => genre.id);
+
+    if (genreFound.length !== favoriteGenre.length) {
+      throw new BadRequestException({
+        message: `Some genre id are not found`,
+        id: favoriteGenre.filter((id) => !genreFound.includes(id)),
+      });
+    }
+
     const SALT_ROUNDS = 10;
     const encryptedPassword = hashSync(password, SALT_ROUNDS);
     await this.prisma.user.create({
-      data: { username, name, password: encryptedPassword },
+      data: {
+        username,
+        name,
+        password: encryptedPassword,
+        favoriteGenre: {
+          connect: favoriteGenre.map((genreId) => {
+            return { id: genreId };
+          }),
+        },
+      },
     });
   }
 }

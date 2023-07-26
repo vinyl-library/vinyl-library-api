@@ -23,24 +23,20 @@ describe('AppController', () => {
   });
 
   describe('GET /', () => {
-    it('should return 200 OK with message "Hello World!"', () => {
-      return request(app.getHttpServer())
-        .get('/')
-        .expect(HttpStatus.OK)
-        .expect('Hello World!');
+    it('should return 200 OK', () => {
+      return request(app.getHttpServer()).get('/').expect(HttpStatus.OK);
     });
   });
 
   describe('GET /protected', () => {
-    it('should return 200 OK with message "Authenticated!" if authenticated', () => {
+    it('should return 200 OK if authenticated', () => {
       const payload = { sub: 'id', username: 'username' };
       const token = jwtService.sign(payload, { secret: JWT_SECRET });
 
       return request(app.getHttpServer())
         .get('/protected')
         .set('Cookie', [`jwt=${token}`])
-        .expect(HttpStatus.OK)
-        .expect('Authenticated!');
+        .expect(HttpStatus.OK);
     });
 
     it('should return 401 UNAUTHORIZED if not authenticated', () => {

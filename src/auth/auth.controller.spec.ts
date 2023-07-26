@@ -69,6 +69,7 @@ describe('AuthController', () => {
         username: 'username',
         name: 'name',
         password: 'password',
+        favoriteGenre: ['genre'],
       };
 
       const successMessage = {
@@ -81,6 +82,28 @@ describe('AuthController', () => {
       // assert
       expect(result).toEqual(successMessage);
       expect(authServiceMock.register).toHaveBeenCalledWith(registerRequestDto);
+    });
+  });
+
+  describe('logout', () => {
+    it('should return success message', async () => {
+      // setup
+      const responseMock: Partial<Response> = {
+        clearCookie: jest.fn(),
+      };
+
+      const successMessage = {
+        message: 'Successfully logged out',
+      };
+
+      // act
+      const result = await authController.logout(responseMock as Response);
+
+      // assert
+      expect(result).toEqual(successMessage);
+      expect(responseMock.clearCookie).toHaveBeenCalledWith('jwt', {
+        httpOnly: true,
+      });
     });
   });
 });

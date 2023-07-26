@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, IsNotEmpty, IsString } from 'class-validator';
 
 export class RegisterRequestDto {
   @IsString()
@@ -12,4 +12,8 @@ export class RegisterRequestDto {
   @IsString()
   @IsNotEmpty()
   password: string;
+
+  @IsArray()
+  @IsString({ each: true })
+  favoriteGenre: string[];
 }
