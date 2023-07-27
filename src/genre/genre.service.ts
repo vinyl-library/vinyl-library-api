@@ -8,6 +8,6 @@ export class GenreService {
   async allGenre() {
     const genre = await this.prisma.genre.findMany();
 
-    return genre;
+    return { genre };
   }
 }
