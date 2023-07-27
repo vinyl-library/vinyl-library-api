@@ -5,10 +5,13 @@ import cookieParser from 'cookie-parser';
 import { hashSync } from 'bcrypt';
 import { AuthModule } from 'src/auth/auth.module';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JWT_SECRET } from 'src/auth/jwt/jwt.constants';
 
 describe('AuthController', () => {
   let app: INestApplication;
   let prismaService: PrismaService;
+  let jwtService: JwtService;
 
   const SALT_ROUNDS = 10;
   const PASSWORD = 'password';
@@ -34,8 +37,10 @@ describe('AuthController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [AuthModule],
+      imports: [AuthModule, JwtModule],
     }).compile();
+
+    jwtService = module.get<JwtService>(JwtService);
 
     app = module.createNestApplication();
     app.use(cookieParser());
@@ -134,6 +139,20 @@ describe('AuthController', () => {
         .post(baseUrl)
         .send(ANOTHER_USER)
         .expect(HttpStatus.BAD_REQUEST);
+    });
+  });
+
+  describe('POST /auth/logout', () => {
+    const baseUrl = '/auth/logout';
+
+    it('should return 200 OK if successfully logged out', () => {
+      const payload = { sub: 'id', username: 'username' };
+      const token = jwtService.sign(payload, { secret: JWT_SECRET });
+
+      return request(app.getHttpServer())
+        .post(baseUrl)
+        .set('Cookie', [`jwt=${token}`])
+        .expect(HttpStatus.OK);
     });
   });
 });

@@ -14,13 +14,15 @@ describe('AppController', () => {
 
   describe('getHello', () => {
     it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+      expect(appController.getHello()).toEqual({ message: 'Hello World!' });
     });
   });
 
   describe('getProtected', () => {
     it('should return "Authenticated!"', () => {
-      expect(appController.getProtected()).toBe('Authenticated!');
+      expect(appController.getProtected()).toEqual({
+        message: 'Authenticated!',
+      });
     });
   });
 });
