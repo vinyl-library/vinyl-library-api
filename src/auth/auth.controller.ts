@@ -52,17 +52,4 @@ export class AuthController {
       message: 'Successfully logged out',
     };
   }
-
-  @IsPublic()
-  @Get('/check/:username')
-  async checkAvailable(@Param('username') username: string) {
-    const status = await this.authService.checkAvailable(username);
-
-    return {
-      message: status ? 'Username available' : 'Username unavailable',
-      data: {
-        status,
-      },
-    };
-  }
 }
