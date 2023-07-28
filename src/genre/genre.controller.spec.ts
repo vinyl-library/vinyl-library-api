@@ -3,18 +3,46 @@ import { GenreController } from './genre.controller';
 import { GenreService } from './genre.service';
 
 describe('GenreController', () => {
-  let controller: GenreController;
+  let genreController: GenreController;
+
+  const genreServiceMock = {
+    allGenre: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [GenreController],
-      providers: [GenreService],
+      providers: [{ provide: GenreService, useValue: genreServiceMock }],
     }).compile();
 
-    controller = module.get<GenreController>(GenreController);
+    genreController = module.get<GenreController>(GenreController);
   });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
+  describe('all genre', () => {
+    it('should return all genre', async () => {
+      // setup
+      const genres = [
+        {
+          id: 'genre1',
+          name: 'Genre 1',
+        },
+        {
+          id: 'genre2',
+          name: 'Genre 2',
+        },
+      ];
+
+      genreServiceMock.allGenre.mockResolvedValue(genres);
+
+      const successMessage = {
+        message: 'Successfully get all genre',
+      };
+
+      // act
+      const result = await genreController.allGenre();
+
+      // assert
+      expect(result).toEqual({ ...successMessage, data: genres });
+    });
   });
 });
