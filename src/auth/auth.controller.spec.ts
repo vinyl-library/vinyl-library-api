@@ -11,6 +11,7 @@ describe('AuthController', () => {
   const authServiceMock = {
     login: jest.fn(),
     register: jest.fn(),
+    checkAvailable: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -30,7 +31,7 @@ describe('AuthController', () => {
   describe('login', () => {
     it('should set JWT cookie and return success message', async () => {
       // setup
-      const loginRequestDto: LoginRequestDto = {
+      const DTO: LoginRequestDto = {
         username: 'username',
         password: 'password',
       };
@@ -41,47 +42,44 @@ describe('AuthController', () => {
         cookie: jest.fn(),
       };
 
-      const successMessage = {
+      const SUCCESS_MESSAGE = {
         message: 'Successfully logged in',
       };
 
       authServiceMock.login.mockResolvedValue(TOKEN);
 
       // act
-      const result = await authController.login(
-        loginRequestDto,
-        responseMock as Response,
-      );
+      const result = await authController.login(DTO, responseMock as Response);
 
       // assert
-      expect(result).toEqual(successMessage);
+      expect(result).toEqual(SUCCESS_MESSAGE);
       expect(responseMock.cookie).toHaveBeenCalledWith('jwt', TOKEN, {
         httpOnly: true,
       });
-      expect(authServiceMock.login).toHaveBeenCalledWith(loginRequestDto);
+      expect(authServiceMock.login).toHaveBeenCalledWith(DTO);
     });
   });
 
   describe('register', () => {
     it('should return success message', async () => {
       // setup
-      const registerRequestDto: RegisterRequestDto = {
+      const DTO: RegisterRequestDto = {
         username: 'username',
         name: 'name',
         password: 'password',
         favoriteGenre: ['genre'],
       };
 
-      const successMessage = {
+      const SUCCESS_MESSAGE = {
         message: 'Successfully registered',
       };
 
       // act
-      const result = await authController.register(registerRequestDto);
+      const result = await authController.register(DTO);
 
       // assert
-      expect(result).toEqual(successMessage);
-      expect(authServiceMock.register).toHaveBeenCalledWith(registerRequestDto);
+      expect(result).toEqual(SUCCESS_MESSAGE);
+      expect(authServiceMock.register).toHaveBeenCalledWith(DTO);
     });
   });
 
@@ -92,7 +90,7 @@ describe('AuthController', () => {
         clearCookie: jest.fn(),
       };
 
-      const successMessage = {
+      const SUCCESS_MESSAGE = {
         message: 'Successfully logged out',
       };
 
@@ -100,10 +98,46 @@ describe('AuthController', () => {
       const result = await authController.logout(responseMock as Response);
 
       // assert
-      expect(result).toEqual(successMessage);
+      expect(result).toEqual(SUCCESS_MESSAGE);
       expect(responseMock.clearCookie).toHaveBeenCalledWith('jwt', {
         httpOnly: true,
       });
+    });
+  });
+
+  describe('check available', () => {
+    const USERNAME = 'username';
+
+    it('should return status true if username available', async () => {
+      // setup
+      const MESSAGE = {
+        message: 'Username available',
+      };
+
+      authServiceMock.checkAvailable.mockResolvedValue(true);
+
+      // act
+      const result = await authController.checkAvailable(USERNAME);
+
+      // assert
+      expect(result).toEqual({ ...MESSAGE, data: { status: true } });
+      expect(authServiceMock.checkAvailable).toBeCalledWith(USERNAME);
+    });
+
+    it('should return status false if username not available', async () => {
+      // setup
+      const MESSAGE = {
+        message: 'Username unavailable',
+      };
+
+      authServiceMock.checkAvailable.mockResolvedValue(false);
+
+      // act
+      const result = await authController.checkAvailable(USERNAME);
+
+      // assert
+      expect(result).toEqual({ ...MESSAGE, data: { status: false } });
+      expect(authServiceMock.checkAvailable).toBeCalledWith(USERNAME);
     });
   });
 });

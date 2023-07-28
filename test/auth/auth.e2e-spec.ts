@@ -155,4 +155,20 @@ describe('AuthController', () => {
         .expect(HttpStatus.OK);
     });
   });
+
+  describe('GET /auth/check/:username', () => {
+    const baseUrl = '/auth/check';
+
+    it('should return 200 OK if username available', () => {
+      return request(app.getHttpServer())
+        .get(baseUrl + `/${TEST_USER.username}`)
+        .expect(HttpStatus.OK);
+    });
+
+    it('should return 200 OK if username unavailable', () => {
+      return request(app.getHttpServer())
+        .get(baseUrl + '/unavailable-username')
+        .expect(HttpStatus.OK);
+    });
+  });
 });
