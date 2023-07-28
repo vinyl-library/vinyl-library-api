@@ -55,7 +55,7 @@ export class AuthController {
 
   @IsPublic()
   @Get('/check/:username')
-  async checkAvailable(@Param('username') username) {
+  async checkAvailable(@Param('username') username: string) {
     const status = await this.authService.checkAvailable(username);
 
     return {
