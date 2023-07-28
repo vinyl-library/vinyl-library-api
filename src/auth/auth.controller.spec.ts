@@ -11,7 +11,6 @@ describe('AuthController', () => {
   const authServiceMock = {
     login: jest.fn(),
     register: jest.fn(),
-    checkAvailable: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -102,42 +101,6 @@ describe('AuthController', () => {
       expect(responseMock.clearCookie).toHaveBeenCalledWith('jwt', {
         httpOnly: true,
       });
-    });
-  });
-
-  describe('check available', () => {
-    const USERNAME = 'username';
-
-    it('should return status true if username available', async () => {
-      // setup
-      const MESSAGE = {
-        message: 'Username available',
-      };
-
-      authServiceMock.checkAvailable.mockResolvedValue(true);
-
-      // act
-      const result = await authController.checkAvailable(USERNAME);
-
-      // assert
-      expect(result).toEqual({ ...MESSAGE, data: { status: true } });
-      expect(authServiceMock.checkAvailable).toBeCalledWith(USERNAME);
-    });
-
-    it('should return status false if username not available', async () => {
-      // setup
-      const MESSAGE = {
-        message: 'Username unavailable',
-      };
-
-      authServiceMock.checkAvailable.mockResolvedValue(false);
-
-      // act
-      const result = await authController.checkAvailable(USERNAME);
-
-      // assert
-      expect(result).toEqual({ ...MESSAGE, data: { status: false } });
-      expect(authServiceMock.checkAvailable).toBeCalledWith(USERNAME);
     });
   });
 });

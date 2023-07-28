@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { GenreModule } from './genre/genre.module';
 import { ConfigModule } from '@nestjs/config';
+import { UserModule } from './user/user.module';
 
 @Module({
   controllers: [AppController],
@@ -14,6 +15,7 @@ import { ConfigModule } from '@nestjs/config';
     AuthModule,
     PrismaModule,
     GenreModule,
+    UserModule,
   ],
 })
 export class AppModule {}
