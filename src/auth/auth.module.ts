@@ -8,9 +8,11 @@ import { JwtAuthGuard } from './jwt/jwt.guard';
 import { JwtStrategy } from './jwt/jwt.strategy';
 import { PrismaModule } from '../prisma/prisma.module';
 import { PrismaService } from '../prisma/prisma.service';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule,
     JwtModule.register({
       global: true,
       secret: JWT_SECRET,
