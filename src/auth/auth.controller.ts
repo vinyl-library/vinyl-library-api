@@ -1,8 +1,10 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
   Res,
 } from '@nestjs/common';
@@ -48,6 +50,19 @@ export class AuthController {
 
     return {
       message: 'Successfully logged out',
+    };
+  }
+
+  @IsPublic()
+  @Get('/check/:username')
+  async checkAvailable(@Param('username') username) {
+    const status = await this.authService.checkAvailable(username);
+
+    return {
+      message: status ? 'Username available' : 'Username unavailable',
+      data: {
+        status,
+      },
     };
   }
 }
