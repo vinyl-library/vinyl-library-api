@@ -21,7 +21,7 @@ describe('GenreController', () => {
   describe('all genre', () => {
     it('should return all genre', async () => {
       // setup
-      const genres = [
+      const GENRES = [
         {
           id: 'genre1',
           name: 'Genre 1',
@@ -32,7 +32,7 @@ describe('GenreController', () => {
         },
       ];
 
-      genreServiceMock.allGenre.mockResolvedValue(genres);
+      genreServiceMock.allGenre.mockResolvedValue(GENRES);
 
       const successMessage = {
         message: 'Successfully get all genre',
@@ -42,7 +42,7 @@ describe('GenreController', () => {
       const result = await genreController.allGenre();
 
       // assert
-      expect(result).toEqual({ ...successMessage, data: genres });
+      expect(result).toEqual({ ...successMessage, data: GENRES });
     });
   });
 });

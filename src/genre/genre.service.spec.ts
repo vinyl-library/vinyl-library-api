@@ -28,7 +28,7 @@ describe('GenreService', () => {
   describe('all genre', () => {
     it('should return all genre', async () => {
       // setup
-      const genres = [
+      const GENRES = [
         {
           id: 'genre1',
           name: 'Genre 1',
@@ -39,13 +39,13 @@ describe('GenreService', () => {
         },
       ];
 
-      prismaServiceMock.genre.findMany.mockResolvedValue(genres);
+      prismaServiceMock.genre.findMany.mockResolvedValue(GENRES);
 
       // act
       const result = await genreService.allGenre();
 
       // assert
-      expect(result).toEqual({ genre: genres });
+      expect(result).toEqual({ genre: GENRES });
       expect(prismaServiceMock.genre.findMany).toBeCalledWith();
     });
   });

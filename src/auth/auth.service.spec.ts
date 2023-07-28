@@ -39,12 +39,12 @@ describe('AuthService', () => {
   });
 
   describe('login', () => {
-    const loginRequestDto: LoginRequestDto = {
+    const DTO: LoginRequestDto = {
       username: 'username',
       password: 'password',
     };
 
-    const mockUser = {
+    const MOCK_USER = {
       id: 'id',
       username: 'username',
       password: 'encrypted password',
@@ -54,26 +54,26 @@ describe('AuthService', () => {
       // setup
       const TOKEN = 'generated token';
 
-      prismaServiceMock.user.findFirst.mockResolvedValue(mockUser);
+      prismaServiceMock.user.findFirst.mockResolvedValue(MOCK_USER);
       jwtServiceMock.sign.mockResolvedValue(TOKEN);
 
       jest.spyOn(bcrypt, 'compareSync').mockReturnValue(true);
 
       // act
-      const result = await authService.login(loginRequestDto);
+      const result = await authService.login(DTO);
 
       // assert
       expect(result).toEqual(expect.any(String));
       expect(prismaServiceMock.user.findFirst).toBeCalledWith({
-        where: { username: loginRequestDto.username },
+        where: { username: DTO.username },
       });
       expect(bcrypt.compareSync).toBeCalledWith(
-        loginRequestDto.password,
-        mockUser.password,
+        DTO.password,
+        MOCK_USER.password,
       );
       expect(jwtServiceMock.sign).toBeCalledWith({
-        sub: mockUser.id,
-        username: mockUser.username,
+        sub: MOCK_USER.id,
+        username: MOCK_USER.username,
       });
     });
 
@@ -82,36 +82,36 @@ describe('AuthService', () => {
       prismaServiceMock.user.findFirst.mockResolvedValue(null);
 
       // act and assert
-      await expect(authService.login(loginRequestDto)).rejects.toThrow(
+      await expect(authService.login(DTO)).rejects.toThrow(
         UnauthorizedException,
       );
       expect(prismaServiceMock.user.findFirst).toBeCalledWith({
-        where: { username: loginRequestDto.username },
+        where: { username: DTO.username },
       });
     });
 
     it('should throw Unauthorized Exception if password is invalid', async () => {
       // setup
-      prismaServiceMock.user.findFirst.mockResolvedValue(mockUser);
+      prismaServiceMock.user.findFirst.mockResolvedValue(MOCK_USER);
 
       jest.spyOn(bcrypt, 'compareSync').mockReturnValue(false);
 
       // act and assert
-      await expect(authService.login(loginRequestDto)).rejects.toThrow(
+      await expect(authService.login(DTO)).rejects.toThrow(
         UnauthorizedException,
       );
       expect(prismaServiceMock.user.findFirst).toBeCalledWith({
-        where: { username: loginRequestDto.username },
+        where: { username: DTO.username },
       });
       expect(bcrypt.compareSync).toBeCalledWith(
-        loginRequestDto.password,
-        mockUser.password,
+        DTO.password,
+        MOCK_USER.password,
       );
     });
   });
 
   describe('register', () => {
-    const registerRequestDto: RegisterRequestDto = {
+    const DTO: RegisterRequestDto = {
       username: 'username',
       name: 'name',
       password: 'password',
@@ -129,30 +129,27 @@ describe('AuthService', () => {
       jest.spyOn(bcrypt, 'hashSync').mockReturnValue(ENCRYPTED_PASSWORD);
 
       // act
-      await authService.register(registerRequestDto);
+      await authService.register(DTO);
 
       // assert
       expect(prismaServiceMock.user.findFirst).toBeCalledWith({
         where: {
-          username: registerRequestDto.username,
+          username: DTO.username,
         },
       });
       expect(prismaServiceMock.genre.findMany).toBeCalledWith({
         where: {
-          id: { in: registerRequestDto.favoriteGenre },
+          id: { in: DTO.favoriteGenre },
         },
       });
-      expect(bcrypt.hashSync).toBeCalledWith(
-        registerRequestDto.password,
-        SALT_ROUNDS,
-      );
+      expect(bcrypt.hashSync).toBeCalledWith(DTO.password, SALT_ROUNDS);
       expect(prismaServiceMock.user.create).toBeCalledWith({
         data: {
-          username: registerRequestDto.username,
-          name: registerRequestDto.name,
+          username: DTO.username,
+          name: DTO.name,
           password: ENCRYPTED_PASSWORD,
           favoriteGenre: {
-            connect: registerRequestDto.favoriteGenre.map((id) => {
+            connect: DTO.favoriteGenre.map((id) => {
               return { id };
             }),
           },
@@ -168,12 +165,12 @@ describe('AuthService', () => {
       });
 
       // act and assert
-      await expect(authService.register(registerRequestDto)).rejects.toThrow(
+      await expect(authService.register(DTO)).rejects.toThrow(
         BadRequestException,
       );
       expect(prismaServiceMock.user.findFirst).toBeCalledWith({
         where: {
-          username: registerRequestDto.username,
+          username: DTO.username,
         },
       });
     });
@@ -184,17 +181,17 @@ describe('AuthService', () => {
       prismaServiceMock.genre.findMany.mockResolvedValue([]);
 
       // act and assert
-      await expect(authService.register(registerRequestDto)).rejects.toThrow(
+      await expect(authService.register(DTO)).rejects.toThrow(
         BadRequestException,
       );
       expect(prismaServiceMock.user.findFirst).toBeCalledWith({
         where: {
-          username: registerRequestDto.username,
+          username: DTO.username,
         },
       });
       expect(prismaServiceMock.genre.findMany).toBeCalledWith({
         where: {
-          id: { in: registerRequestDto.favoriteGenre },
+          id: { in: DTO.favoriteGenre },
         },
       });
     });
