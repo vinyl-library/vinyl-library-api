@@ -1,11 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
+import { Request } from 'express';
 
 describe('UserController', () => {
   let userController: UserController;
 
   const userServiceMock = {
+    getUser: jest.fn(),
     checkAvailable: jest.fn(),
   };
 
@@ -16,6 +18,38 @@ describe('UserController', () => {
     }).compile();
 
     userController = module.get<UserController>(UserController);
+  });
+
+  describe('get user', () => {
+    it('should return logged in user', async () => {
+      // setup
+      const USER = {
+        username: 'user1',
+      };
+
+      const requestMock: Partial<Request> = {
+        user: USER,
+      };
+
+      const RESOLVED_USER = {
+        username: 'user1',
+        name: 'User 1',
+        fine: 0,
+      };
+
+      userServiceMock.getUser.mockResolvedValue(RESOLVED_USER);
+
+      const SUCCESS_MESSAGE = {
+        message: 'Successfully get user',
+      };
+
+      // act
+      const result = await userController.getUser(requestMock as Request);
+
+      // assert
+      expect(result).toEqual({ ...SUCCESS_MESSAGE, data: RESOLVED_USER });
+      expect(userServiceMock.getUser).toBeCalledWith(USER.username);
+    });
   });
 
   describe('check available', () => {
