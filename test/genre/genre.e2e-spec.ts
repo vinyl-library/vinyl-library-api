@@ -4,17 +4,18 @@ import cookieParser from 'cookie-parser';
 import request from 'supertest';
 import { GenreModule } from 'src/genre/genre.module';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { uuid } from 'uuidv4';
 
 describe('GenreController', () => {
   let app: INestApplication;
   let prismaService: PrismaService;
 
   const GENRE_1 = {
-    id: 'genre_1',
+    id: '',
     name: 'Genre 1',
   };
   const GENRE_2 = {
-    id: 'genre_2',
+    id: 'g',
     name: 'Genre 2',
   };
 
@@ -28,6 +29,9 @@ describe('GenreController', () => {
     await app.init();
 
     prismaService = module.get<PrismaService>(PrismaService);
+
+    GENRE_1.id = uuid();
+    GENRE_2.id = uuid();
 
     await prismaService.genre.createMany({
       data: [GENRE_1, GENRE_2],

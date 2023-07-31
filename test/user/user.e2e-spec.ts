@@ -10,6 +10,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
 import { JwtStrategy } from 'src/auth/jwt/jwt.strategy';
 import { ConfigModule } from '@nestjs/config';
+import { uuid } from 'uuidv4';
 
 describe('UserController', () => {
   let app: INestApplication;
@@ -17,7 +18,7 @@ describe('UserController', () => {
   let jwtService: JwtService;
 
   const USER = {
-    id: 'user1',
+    id: '',
     username: 'user1',
     name: 'User 1',
     password: 'password',
@@ -35,6 +36,8 @@ describe('UserController', () => {
 
     prismaService = module.get<PrismaService>(PrismaService);
     jwtService = module.get<JwtService>(JwtService);
+
+    USER.id = uuid();
 
     await prismaService.user.create({
       data: USER,

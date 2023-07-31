@@ -2,11 +2,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import cookieParser from 'cookie-parser';
+import randomstring from 'randomstring';
 import { hashSync } from 'bcrypt';
 import { AuthModule } from 'src/auth/auth.module';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { JWT_SECRET } from 'src/auth/jwt/jwt.constants';
+import { uuid } from 'uuidv4';
 
 describe('AuthController', () => {
   let app: INestApplication;
@@ -16,23 +18,23 @@ describe('AuthController', () => {
   const SALT_ROUNDS = 10;
   const PASSWORD = 'password';
   const GENRE_1 = {
-    id: 'genre_1',
+    id: '',
     name: 'Genre 1',
   };
   const GENRE_2 = {
-    id: 'genre_2',
+    id: '',
     name: 'Genre 2',
   };
   const TEST_USER = {
-    username: 'testuser',
+    username: '',
     name: 'testuser',
     password: hashSync(PASSWORD, SALT_ROUNDS),
   };
   const ANOTHER_USER = {
-    username: 'anotheruser',
+    username: '',
     name: 'Another User',
     password: 'password',
-    favoriteGenre: [GENRE_1.id, GENRE_2.id],
+    favoriteGenre: [],
   };
 
   beforeEach(async () => {
@@ -47,6 +49,12 @@ describe('AuthController', () => {
     await app.init();
 
     prismaService = module.get<PrismaService>(PrismaService);
+
+    GENRE_1.id = uuid();
+    GENRE_2.id = uuid();
+    TEST_USER.username = randomstring.generate(5);
+    ANOTHER_USER.username = randomstring.generate(5);
+    ANOTHER_USER.favoriteGenre = [GENRE_1.id, GENRE_2.id];
 
     await prismaService.user.create({
       data: TEST_USER,
@@ -124,7 +132,7 @@ describe('AuthController', () => {
       return request(app.getHttpServer())
         .post(baseUrl)
         .send({
-          username: 'testuser',
+          username: TEST_USER.username,
           name: 'Another Test User',
           password: 'password',
           favoriteGenre: [],
