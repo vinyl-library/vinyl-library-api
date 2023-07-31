@@ -7,6 +7,7 @@ describe('GenreController', () => {
 
   const genreServiceMock = {
     allGenre: jest.fn(),
+    getGenre: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -43,6 +44,29 @@ describe('GenreController', () => {
 
       // assert
       expect(result).toEqual({ ...successMessage, data: GENRES });
+    });
+  });
+
+  describe('get genre', () => {
+    it('should return genre detail if genre exists', async () => {
+      // setup
+      const GENRE = {
+        id: 'genreId',
+        name: 'Genre',
+        bookCount: 2,
+      };
+
+      genreServiceMock.getGenre.mockResolvedValue(GENRE);
+
+      const successMessage = {
+        message: 'Successfully get genre detail',
+      };
+
+      // act
+      const result = await genreController.getGenre(GENRE.id);
+
+      // assert
+      expect(result).toEqual({ ...successMessage, data: GENRE });
     });
   });
 });

@@ -51,4 +51,20 @@ describe('GenreController', () => {
       return request(app.getHttpServer()).get(baseUrl).expect(HttpStatus.OK);
     });
   });
+
+  describe('GET /genre/:genreId', () => {
+    const baseUrl = '/genre';
+
+    it('should return 200 OK if success', () => {
+      return request(app.getHttpServer())
+        .get(baseUrl + `/${GENRE_1.id}`)
+        .expect(HttpStatus.OK);
+    });
+
+    it('should return 400 BAD REQUEST if genre id invalid', () => {
+      return request(app.getHttpServer())
+        .get(baseUrl + '/invalid-id')
+        .expect(HttpStatus.BAD_REQUEST);
+    });
+  });
 });
