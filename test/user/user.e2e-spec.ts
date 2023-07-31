@@ -53,31 +53,31 @@ describe('UserController', () => {
   });
 
   describe('GET /user', () => {
-    const baseUrl = '/user';
+    const baseUrl = () => '/user';
 
     it('should return 200 OK if user logged in', () => {
       const payload = { sub: USER.id, username: USER.username };
       const token = jwtService.sign(payload, { secret: JWT_SECRET });
 
       return request(app.getHttpServer())
-        .get(baseUrl)
+        .get(baseUrl())
         .set('Cookie', [`jwt=${token}`])
         .expect(HttpStatus.OK);
     });
   });
 
   describe('GET /user/check/:username', () => {
-    const baseUrl = '/user/check';
+    const baseUrl = (username: string) => `/user/check/${username}`;
 
     it('should return 200 OK if username available', () => {
       return request(app.getHttpServer())
-        .get(baseUrl + `/${USER.username}`)
+        .get(baseUrl(USER.username))
         .expect(HttpStatus.OK);
     });
 
     it('should return 200 OK if username unavailable', () => {
       return request(app.getHttpServer())
-        .get(baseUrl + '/unavailable-username')
+        .get(baseUrl('unavailable-username'))
         .expect(HttpStatus.OK);
     });
   });

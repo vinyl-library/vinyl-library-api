@@ -84,11 +84,11 @@ describe('AuthController', () => {
   });
 
   describe('POST /auth/login', () => {
-    const baseUrl = '/auth/login';
+    const baseUrl = () => '/auth/login';
 
     it('should return 200 OK if login success', () => {
       return request(app.getHttpServer())
-        .post(baseUrl)
+        .post(baseUrl())
         .send({
           username: TEST_USER.username,
           password: PASSWORD,
@@ -99,7 +99,7 @@ describe('AuthController', () => {
 
     it('should return 401 UNAUTHORIZED if username not found', () => {
       return request(app.getHttpServer())
-        .post(baseUrl)
+        .post(baseUrl())
         .send({
           username: 'wrongusername',
           password: PASSWORD,
@@ -109,7 +109,7 @@ describe('AuthController', () => {
 
     it('should return 401 UNAUTHORIZED if password invalid', () => {
       return request(app.getHttpServer())
-        .post(baseUrl)
+        .post(baseUrl())
         .send({
           username: TEST_USER.username,
           password: 'wrongpassword',
@@ -119,18 +119,18 @@ describe('AuthController', () => {
   });
 
   describe('POST /auth/register', () => {
-    const baseUrl = '/auth/register';
+    const baseUrl = () => '/auth/register';
 
     it('should return 201 CREATED if register success', () => {
       return request(app.getHttpServer())
-        .post(baseUrl)
+        .post(baseUrl())
         .send(ANOTHER_USER)
         .expect(HttpStatus.CREATED);
     });
 
     it('should return 400 BAD REQUEST if username already exists', () => {
       return request(app.getHttpServer())
-        .post(baseUrl)
+        .post(baseUrl())
         .send({
           username: TEST_USER.username,
           name: 'Another Test User',
@@ -144,21 +144,21 @@ describe('AuthController', () => {
       ANOTHER_USER.favoriteGenre.push('invalid_genre');
 
       return request(app.getHttpServer())
-        .post(baseUrl)
+        .post(baseUrl())
         .send(ANOTHER_USER)
         .expect(HttpStatus.BAD_REQUEST);
     });
   });
 
   describe('POST /auth/logout', () => {
-    const baseUrl = '/auth/logout';
+    const baseUrl = () => '/auth/logout';
 
     it('should return 200 OK if successfully logged out', () => {
       const payload = { sub: 'id', username: 'username' };
       const token = jwtService.sign(payload, { secret: JWT_SECRET });
 
       return request(app.getHttpServer())
-        .post(baseUrl)
+        .post(baseUrl())
         .set('Cookie', [`jwt=${token}`])
         .expect(HttpStatus.OK);
     });

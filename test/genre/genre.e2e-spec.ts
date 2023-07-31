@@ -49,35 +49,35 @@ describe('GenreController', () => {
   });
 
   describe('GET /genre', () => {
-    const baseUrl = '/genre';
+    const baseUrl = () => '/genre';
 
     it('should return 200 OK if success', () => {
-      return request(app.getHttpServer()).get(baseUrl).expect(HttpStatus.OK);
+      return request(app.getHttpServer()).get(baseUrl()).expect(HttpStatus.OK);
     });
   });
 
   describe('GET /genre/:genreId', () => {
-    const baseUrl = '/genre';
+    const baseUrl = (id: string) => `/genre/${id}`;
 
     it('should return 200 OK if success', () => {
       return request(app.getHttpServer())
-        .get(baseUrl + `/${GENRE_1.id}`)
+        .get(baseUrl(GENRE_1.id))
         .expect(HttpStatus.OK);
     });
 
     it('should return 400 BAD REQUEST if genre id invalid', () => {
       return request(app.getHttpServer())
-        .get(baseUrl + '/invalid-id')
+        .get(baseUrl('invalid-id'))
         .expect(HttpStatus.BAD_REQUEST);
     });
   });
 
   describe('POST /genre', () => {
-    const baseUrl = '/genre';
+    const baseUrl = () => '/genre';
 
     it('should return 201 CREATED', () => {
       return request(app.getHttpServer())
-        .post(baseUrl)
+        .post(baseUrl())
         .send({
           name: 'Genre',
         })
