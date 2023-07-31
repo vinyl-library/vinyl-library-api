@@ -1,6 +1,7 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { GenreService } from './genre.service';
 import { IsPublic } from 'src/common/decorator/isPublic';
+import { AddGenreRequestDto } from './dto/AddGenreRequest.dto';
 
 @Controller('genre')
 export class GenreController {
@@ -24,6 +25,15 @@ export class GenreController {
     return {
       message: 'Successfully get genre detail',
       data,
+    };
+  }
+
+  @Post()
+  async addGenre(@Body() addGenreRequestDto: AddGenreRequestDto) {
+    await this.genreService.addGenre(addGenreRequestDto);
+
+    return {
+      message: 'Successfully added new genre',
     };
   }
 }

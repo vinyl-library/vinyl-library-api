@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { AddGenreRequestDto } from './dto/AddGenreRequest.dto';
 
 @Injectable()
 export class GenreService {
@@ -36,5 +37,13 @@ export class GenreService {
       name: genre.name,
       bookCount: genre._count.books,
     };
+  }
+
+  async addGenre({ name }: AddGenreRequestDto) {
+    await this.prisma.genre.create({
+      data: {
+        name,
+      },
+    });
   }
 }

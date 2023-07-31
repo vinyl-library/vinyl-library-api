@@ -10,6 +10,7 @@ describe('GenreService', () => {
     genre: {
       findMany: jest.fn(),
       findFirst: jest.fn(),
+      create: jest.fn(),
     },
   };
 
@@ -112,6 +113,25 @@ describe('GenreService', () => {
               books: true,
             },
           },
+        },
+      });
+    });
+  });
+
+  describe('add genre', () => {
+    it('should create new genre', async () => {
+      // setup
+      const addGenreRequestDto = {
+        name: 'Genre',
+      };
+
+      // act
+      await genreService.addGenre(addGenreRequestDto);
+
+      // assert
+      expect(prismaServiceMock.genre.create).toBeCalledWith({
+        data: {
+          name: addGenreRequestDto.name,
         },
       });
     });

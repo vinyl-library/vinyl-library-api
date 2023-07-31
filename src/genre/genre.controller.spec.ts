@@ -8,6 +8,7 @@ describe('GenreController', () => {
   const genreServiceMock = {
     allGenre: jest.fn(),
     getGenre: jest.fn(),
+    addGenre: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -67,6 +68,26 @@ describe('GenreController', () => {
 
       // assert
       expect(result).toEqual({ ...successMessage, data: GENRE });
+    });
+  });
+
+  describe('add genre', () => {
+    it('should create new genre', async () => {
+      // setup
+      const addGenreRequestDto = {
+        name: 'Genre',
+      };
+
+      const successMessage = {
+        message: 'Successfully added new genre',
+      };
+
+      // act
+      const result = await genreController.addGenre(addGenreRequestDto);
+
+      // assert
+      expect(genreServiceMock.addGenre).toBeCalledWith(addGenreRequestDto);
+      expect(result).toEqual(successMessage);
     });
   });
 });

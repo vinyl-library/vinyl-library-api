@@ -67,4 +67,17 @@ describe('GenreController', () => {
         .expect(HttpStatus.BAD_REQUEST);
     });
   });
+
+  describe('POST /genre', () => {
+    const baseUrl = '/genre';
+
+    it('should return 201 CREATED', () => {
+      return request(app.getHttpServer())
+        .post(baseUrl)
+        .send({
+          name: 'Genre',
+        })
+        .expect(HttpStatus.CREATED);
+    });
+  });
 });
