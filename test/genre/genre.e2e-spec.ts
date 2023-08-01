@@ -4,17 +4,18 @@ import cookieParser from 'cookie-parser';
 import request from 'supertest';
 import { GenreModule } from 'src/genre/genre.module';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { uuid } from 'uuidv4';
 
 describe('GenreController', () => {
   let app: INestApplication;
   let prismaService: PrismaService;
 
   const GENRE_1 = {
-    id: 'genre_1',
+    id: '',
     name: 'Genre 1',
   };
   const GENRE_2 = {
-    id: 'genre_2',
+    id: 'g',
     name: 'Genre 2',
   };
 
@@ -28,6 +29,9 @@ describe('GenreController', () => {
     await app.init();
 
     prismaService = module.get<PrismaService>(PrismaService);
+
+    GENRE_1.id = uuid();
+    GENRE_2.id = uuid();
 
     await prismaService.genre.createMany({
       data: [GENRE_1, GENRE_2],
@@ -45,10 +49,55 @@ describe('GenreController', () => {
   });
 
   describe('GET /genre', () => {
-    const baseUrl = '/genre';
+    const baseUrl = () => '/genre';
 
     it('should return 200 OK if success', () => {
-      return request(app.getHttpServer()).get(baseUrl).expect(HttpStatus.OK);
+      return request(app.getHttpServer()).get(baseUrl()).expect(HttpStatus.OK);
+    });
+  });
+
+  describe('GET /genre/:genreId', () => {
+    const baseUrl = (id: string) => `/genre/${id}`;
+
+    it('should return 200 OK if success', () => {
+      return request(app.getHttpServer())
+        .get(baseUrl(GENRE_1.id))
+        .expect(HttpStatus.OK);
+    });
+
+    it('should return 400 BAD REQUEST if genre id invalid', () => {
+      return request(app.getHttpServer())
+        .get(baseUrl('invalid-id'))
+        .expect(HttpStatus.BAD_REQUEST);
+    });
+  });
+
+  describe('POST /genre', () => {
+    const baseUrl = () => '/genre';
+
+    it('should return 201 CREATED', () => {
+      return request(app.getHttpServer())
+        .post(baseUrl())
+        .send({
+          name: 'Genre',
+        })
+        .expect(HttpStatus.CREATED);
+    });
+  });
+
+  describe('DELETE /genre/:genreId', () => {
+    const baseUrl = (genreId: string) => `/genre/${genreId}`;
+
+    it('should return 200 OK if success', () => {
+      return request(app.getHttpServer())
+        .delete(baseUrl(GENRE_1.id))
+        .expect(HttpStatus.OK);
+    });
+
+    it('should return 400 BAD REQUEST if genre id invalid', () => {
+      return request(app.getHttpServer())
+        .delete(baseUrl('invalidId'))
+        .expect(HttpStatus.BAD_REQUEST);
     });
   });
 });

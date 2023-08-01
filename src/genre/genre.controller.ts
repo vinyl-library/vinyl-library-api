@@ -1,6 +1,7 @@
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { GenreService } from './genre.service';
 import { IsPublic } from 'src/common/decorator/isPublic';
+import { AddGenreRequestDto } from './dto/AddGenreRequest.dto';
 
 @Controller('genre')
 export class GenreController {
@@ -14,6 +15,34 @@ export class GenreController {
     return {
       message: 'Successfully get all genre',
       data,
+    };
+  }
+
+  @Get('/:genreId')
+  async getGenre(@Param('genreId') genreId: string) {
+    const data = await this.genreService.getGenre(genreId);
+
+    return {
+      message: 'Successfully get genre detail',
+      data,
+    };
+  }
+
+  @Post()
+  async addGenre(@Body() addGenreRequestDto: AddGenreRequestDto) {
+    await this.genreService.addGenre(addGenreRequestDto);
+
+    return {
+      message: 'Successfully added new genre',
+    };
+  }
+
+  @Delete('/:genreId')
+  async deleteGenre(@Param('genreId') genreId: string) {
+    await this.genreService.deleteGenre(genreId);
+
+    return {
+      message: 'Successfully deleted genre',
     };
   }
 }

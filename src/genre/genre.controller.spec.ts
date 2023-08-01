@@ -7,6 +7,9 @@ describe('GenreController', () => {
 
   const genreServiceMock = {
     allGenre: jest.fn(),
+    getGenre: jest.fn(),
+    addGenre: jest.fn(),
+    deleteGenre: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -43,6 +46,67 @@ describe('GenreController', () => {
 
       // assert
       expect(result).toEqual({ ...successMessage, data: GENRES });
+    });
+  });
+
+  describe('get genre', () => {
+    it('should return genre detail if genre exists', async () => {
+      // setup
+      const GENRE = {
+        id: 'genreId',
+        name: 'Genre',
+        bookCount: 2,
+      };
+
+      genreServiceMock.getGenre.mockResolvedValue(GENRE);
+
+      const successMessage = {
+        message: 'Successfully get genre detail',
+      };
+
+      // act
+      const result = await genreController.getGenre(GENRE.id);
+
+      // assert
+      expect(result).toEqual({ ...successMessage, data: GENRE });
+    });
+  });
+
+  describe('add genre', () => {
+    it('should create new genre', async () => {
+      // setup
+      const addGenreRequestDto = {
+        name: 'Genre',
+      };
+
+      const successMessage = {
+        message: 'Successfully added new genre',
+      };
+
+      // act
+      const result = await genreController.addGenre(addGenreRequestDto);
+
+      // assert
+      expect(genreServiceMock.addGenre).toBeCalledWith(addGenreRequestDto);
+      expect(result).toEqual(successMessage);
+    });
+  });
+
+  describe('delete genre', () => {
+    it('should delete the genre', async () => {
+      // setup
+      const genreId = 'genreId';
+
+      const successMessage = {
+        message: 'Successfully deleted genre',
+      };
+
+      // act
+      const result = await genreController.deleteGenre(genreId);
+
+      // assert
+      expect(genreServiceMock.deleteGenre).toBeCalledWith(genreId);
+      expect(result).toEqual(successMessage);
     });
   });
 });
