@@ -46,4 +46,22 @@ export class GenreService {
       },
     });
   }
+
+  async deleteGenre(genreId: string) {
+    const genre = await this.prisma.genre.findFirst({
+      where: {
+        id: genreId,
+      },
+    });
+
+    if (!genre) {
+      throw new BadRequestException({ message: 'Invalid genre id' });
+    }
+
+    await this.prisma.genre.delete({
+      where: {
+        id: genreId,
+      },
+    });
+  }
 }

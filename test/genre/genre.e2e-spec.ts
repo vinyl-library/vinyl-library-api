@@ -84,4 +84,20 @@ describe('GenreController', () => {
         .expect(HttpStatus.CREATED);
     });
   });
+
+  describe('DELETE /genre/:genreId', () => {
+    const baseUrl = (genreId: string) => `/genre/${genreId}`;
+
+    it('should return 200 OK if success', () => {
+      return request(app.getHttpServer())
+        .delete(baseUrl(GENRE_1.id))
+        .expect(HttpStatus.OK);
+    });
+
+    it('should return 400 BAD REQUEST if genre id invalid', () => {
+      return request(app.getHttpServer())
+        .delete(baseUrl('invalidId'))
+        .expect(HttpStatus.BAD_REQUEST);
+    });
+  });
 });

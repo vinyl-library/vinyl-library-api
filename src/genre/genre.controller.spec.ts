@@ -9,6 +9,7 @@ describe('GenreController', () => {
     allGenre: jest.fn(),
     getGenre: jest.fn(),
     addGenre: jest.fn(),
+    deleteGenre: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -87,6 +88,24 @@ describe('GenreController', () => {
 
       // assert
       expect(genreServiceMock.addGenre).toBeCalledWith(addGenreRequestDto);
+      expect(result).toEqual(successMessage);
+    });
+  });
+
+  describe('delete genre', () => {
+    it('should delete the genre', async () => {
+      // setup
+      const genreId = 'genreId';
+
+      const successMessage = {
+        message: 'Successfully deleted genre',
+      };
+
+      // act
+      const result = await genreController.deleteGenre(genreId);
+
+      // assert
+      expect(genreServiceMock.deleteGenre).toBeCalledWith(genreId);
       expect(result).toEqual(successMessage);
     });
   });

@@ -11,6 +11,7 @@ describe('GenreService', () => {
       findMany: jest.fn(),
       findFirst: jest.fn(),
       create: jest.fn(),
+      delete: jest.fn(),
     },
   };
 
@@ -26,6 +27,8 @@ describe('GenreService', () => {
     }).compile();
 
     genreService = module.get<GenreService>(GenreService);
+
+    jest.clearAllMocks();
   });
 
   describe('all genre', () => {
@@ -93,17 +96,17 @@ describe('GenreService', () => {
 
     it('should throw Bad Request Exception if genre id invalid', async () => {
       // setup
-      const genreId = 'invalidId';
+      const GENRE_ID = 'invalidId';
 
       prismaServiceMock.genre.findFirst.mockResolvedValue(null);
 
       // act and assert
-      await expect(genreService.getGenre(genreId)).rejects.toThrow(
+      await expect(genreService.getGenre(GENRE_ID)).rejects.toThrow(
         BadRequestException,
       );
       expect(prismaServiceMock.genre.findFirst).toBeCalledWith({
         where: {
-          id: genreId,
+          id: GENRE_ID,
         },
         select: {
           id: true,
@@ -134,6 +137,51 @@ describe('GenreService', () => {
           name: addGenreRequestDto.name,
         },
       });
+    });
+  });
+
+  describe('delete genre', () => {
+    it('should delete the genre if genre exists', async () => {
+      // setup
+      const GENRE = {
+        id: 'genreId',
+        name: 'Genre',
+      };
+
+      prismaServiceMock.genre.findFirst.mockResolvedValue(GENRE);
+
+      // act
+      await genreService.deleteGenre(GENRE.id);
+
+      // assert
+      expect(prismaServiceMock.genre.findFirst).toBeCalledWith({
+        where: {
+          id: GENRE.id,
+        },
+      });
+      expect(prismaServiceMock.genre.delete).toBeCalledWith({
+        where: {
+          id: GENRE.id,
+        },
+      });
+    });
+
+    it('should throw Bad Request Exception if genre id invalid', async () => {
+      // setup
+      const GENRE_ID = 'invalidId';
+
+      prismaServiceMock.genre.findFirst.mockResolvedValue(null);
+
+      // act and assert
+      await expect(genreService.deleteGenre(GENRE_ID)).rejects.toThrow(
+        BadRequestException,
+      );
+      expect(prismaServiceMock.genre.findFirst).toBeCalledWith({
+        where: {
+          id: GENRE_ID,
+        },
+      });
+      expect(prismaServiceMock.genre.delete).toBeCalledTimes(0);
     });
   });
 });
