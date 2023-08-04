@@ -22,14 +22,16 @@ model User {
 }
 
 model Book {
-    id           String  @id @default(uuid())
+    id           String   @id @default(uuid())
     title        String
     author       String
+    publisher    String
     description  String
     coverUrl     String?
     pages        Int
     stock        Int
-    rating       Float
+    rating       Float    @default(0)
+    publishDate  DateTime
     genre        Genre[]
     loans        Loan[]
     wishlistedBy User[]
