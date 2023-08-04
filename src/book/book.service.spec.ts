@@ -4,7 +4,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { AddBookRequestDto } from './dto/AddBookRequest.dto';
 import * as uuid from 'uuidv4';
-import { FILE } from 'dns';
 import { BadRequestException } from '@nestjs/common';
 
 describe('BookService', () => {
@@ -13,6 +12,7 @@ describe('BookService', () => {
   const prismaServiceMock = {
     book: {
       create: jest.fn(),
+      findMany: jest.fn(),
     },
     genre: {
       findMany: jest.fn(),
@@ -120,6 +120,51 @@ describe('BookService', () => {
       await expect(
         bookService.addBook(FILE_MOCK as Express.Multer.File, DTO),
       ).rejects.toThrow(BadRequestException);
+    });
+  });
+
+  describe('get all books', () => {
+    const BOOK_1 = {
+      id: 'book_1',
+      title: 'Book 1',
+      author: 'Author',
+      rating: 4.3,
+      genre: [
+        {
+          name: 'Drama',
+        },
+        {
+          name: 'Fiction',
+        },
+      ],
+      coverUrl: 'url',
+    };
+
+    const BOOK_2 = {
+      id: 'book_2',
+      title: 'Book 2',
+      author: 'Author',
+      rating: 4.3,
+      genre: [
+        {
+          name: 'Drama',
+        },
+        {
+          name: 'Fiction',
+        },
+      ],
+      coverUrl: 'url',
+    };
+
+    it('should return all books', async () => {
+      // setup
+      prismaServiceMock.book.findMany.mockResolvedValue([BOOK_1, BOOK_2]);
+
+      // act
+      const result = await bookService.getAllBooks();
+
+      // assert
+      expect(result).toEqual({ books: [BOOK_1, BOOK_2] });
     });
   });
 });

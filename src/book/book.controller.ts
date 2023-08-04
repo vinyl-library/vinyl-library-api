@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
   UploadedFile,
   UseInterceptors,
@@ -8,6 +9,7 @@ import {
 import { BookService } from './book.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AddBookRequestDto } from './dto/AddBookRequest.dto';
+import { IsPublic } from 'src/common/decorator/isPublic';
 
 @Controller('book')
 export class BookController {
@@ -24,5 +26,12 @@ export class BookController {
     return {
       message: 'Successfully added a book',
     };
+  }
+
+  @IsPublic()
+  @Get()
+  async getAllBooks() {
+    const data = await this.bookService.getAllBooks();
+    return { message: 'Successfully get all books', data };
   }
 }
