@@ -37,7 +37,6 @@ export class BookService {
       data: {
         id: bookId,
         coverUrl: uploadRes ? uploadRes.url : '',
-        rating: 0,
         ...rest,
         genre: {
           connect: genre.map((id) => {
