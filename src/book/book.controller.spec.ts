@@ -1,13 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BookController } from './book.controller';
 import { BookService } from './book.service';
-import { FILE } from 'dns';
 import { AddBookRequestDto } from './dto/AddBookRequest.dto';
 
 describe('BookController', () => {
   let bookController: BookController;
   const bookServiceMock = {
     addBook: jest.fn(),
+    getAllBooks: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -50,8 +50,61 @@ describe('BookController', () => {
         DTO,
       );
 
+      // assert
       expect(result).toEqual(SUCCESS_MESSAGE);
       expect(bookServiceMock.addBook).toBeCalledWith(FILE_MOCK, DTO);
+    });
+  });
+
+  describe('get all books', () => {
+    const BOOKS = {
+      books: [
+        {
+          id: 'book_1',
+          title: 'Book 1',
+          author: 'Author',
+          rating: 4.3,
+          genre: [
+            {
+              name: 'Drama',
+            },
+            {
+              name: 'Fiction',
+            },
+          ],
+          coverUrl: 'url',
+        },
+        {
+          id: 'book_2',
+          title: 'Book 2',
+          author: 'Author',
+          rating: 4.3,
+          genre: [
+            {
+              name: 'Drama',
+            },
+            {
+              name: 'Fiction',
+            },
+          ],
+          coverUrl: 'url',
+        },
+      ],
+    };
+
+    it('should return all books', async () => {
+      // setup
+      bookServiceMock.getAllBooks.mockResolvedValue(BOOKS);
+      const SUCCESS_MESSAGE = {
+        message: 'Successfully get all books',
+      };
+
+      // act
+      const result = await bookController.getAllBooks();
+
+      // assert
+      expect(result).toEqual({ ...SUCCESS_MESSAGE, data: BOOKS });
+      expect(bookServiceMock.getAllBooks).toBeCalled();
     });
   });
 });

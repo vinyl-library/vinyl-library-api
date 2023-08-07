@@ -46,4 +46,23 @@ export class BookService {
       },
     });
   }
+
+  async getAllBooks() {
+    const books = await this.prisma.book.findMany({
+      select: {
+        id: true,
+        author: true,
+        title: true,
+        rating: true,
+        coverUrl: true,
+        genre: {
+          select: {
+            name: true
+          }
+        }
+      }
+    });
+
+    return { books };
+  }
 }
