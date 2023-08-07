@@ -57,12 +57,55 @@ export class BookService {
         coverUrl: true,
         genre: {
           select: {
-            name: true
-          }
-        }
-      }
+            name: true,
+          },
+        },
+      },
     });
 
     return { books };
+  }
+
+  async getRecommendedBooks(username: string) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        username,
+      },
+      include: {
+        favoriteGenre: true,
+      },
+    });
+
+    const books = await this.prisma.book.findMany({
+      where: {
+        genre: {
+          some: {
+            id: {
+              in: user.favoriteGenre.map((genre) => genre.id),
+            },
+          },
+        },
+      },
+      select: {
+        id: true,
+        author: true,
+        title: true,
+        rating: true,
+        coverUrl: true,
+        genre: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        rating: 'desc',
+      },
+      take: 10,
+    });
+
+    return {
+      books,
+    };
   }
 }
