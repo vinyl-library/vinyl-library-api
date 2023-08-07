@@ -161,7 +161,7 @@ describe('BookService', () => {
       prismaServiceMock.book.findMany.mockResolvedValue([BOOK_1, BOOK_2]);
 
       // act
-      const result = await bookService.getAllBooks();
+      const result = await bookService.getAllBooks({});
 
       // assert
       expect(result).toEqual({ books: [BOOK_1, BOOK_2] });

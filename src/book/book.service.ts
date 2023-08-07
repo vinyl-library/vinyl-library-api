@@ -3,6 +3,7 @@ import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { AddBookRequestDto } from './dto/AddBookRequest.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { uuid } from 'uuidv4';
+import { GetAllBooksQueryDto } from './dto/GetAllBooksQuery.dto';
 
 @Injectable()
 export class BookService {
@@ -47,8 +48,50 @@ export class BookService {
     });
   }
 
-  async getAllBooks() {
+  async getAllBooks({
+    keyword,
+    ratingMin = 0,
+    ratingMax = 5,
+    genres = [],
+    stock = 'available',
+  }: GetAllBooksQueryDto) {
+    type QueryMode = 'insensitive' | 'default';
+
     const books = await this.prisma.book.findMany({
+      where: {
+        ...(keyword && {
+          OR: [
+            {
+              title: {
+                contains: keyword,
+                mode: 'insensitive' as QueryMode,
+              },
+            },
+            {
+              author: {
+                contains: keyword,
+                mode: 'insensitive' as QueryMode,
+              },
+            },
+          ],
+        }),
+        rating: {
+          lte: ratingMax,
+          gte: ratingMin,
+        },
+        ...(genres.length > 0 && {
+          genre: {
+            some: {
+              id: {
+                in: genres,
+              },
+            },
+          },
+        }),
+        stock: {
+          gte: stock === 'available' ? 1 : 0,
+        },
+      },
       select: {
         id: true,
         author: true,

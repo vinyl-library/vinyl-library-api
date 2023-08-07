@@ -2,7 +2,9 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
+  Query,
   Req,
   UploadedFile,
   UseInterceptors,
@@ -13,6 +15,7 @@ import { AddBookRequestDto } from './dto/AddBookRequest.dto';
 import { IsPublic } from 'src/common/decorator/isPublic';
 import { Request } from 'express';
 import { User } from '@prisma/client';
+import { GetAllBooksQueryDto } from './dto/GetAllBooksQuery.dto';
 
 @Controller('book')
 export class BookController {
@@ -33,8 +36,9 @@ export class BookController {
 
   @IsPublic()
   @Get()
-  async getAllBooks() {
-    const data = await this.bookService.getAllBooks();
+  async getAllBooks(@Query() query: GetAllBooksQueryDto) {
+    const data = await this.bookService.getAllBooks(query);
+
     return { message: 'Successfully get all books', data };
   }
 
