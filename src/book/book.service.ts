@@ -54,6 +54,7 @@ export class BookService {
     ratingMax = 5,
     genres = [],
     stock = 'available',
+    page = 1,
   }: GetAllBooksQueryDto) {
     type QueryMode = 'insensitive' | 'default';
 
@@ -106,7 +107,22 @@ export class BookService {
       },
     });
 
-    return { books };
+    const BOOK_PER_PAGE = 10;
+    const paginated = books.slice(
+      BOOK_PER_PAGE * (page - 1),
+      BOOK_PER_PAGE * page,
+    );
+
+    return {
+      books: paginated,
+      pagination: {
+        page,
+        from: BOOK_PER_PAGE * (page - 1) + 1,
+        to: Math.min(BOOK_PER_PAGE * page, books.length),
+        total: books.length,
+        totalPage: Math.ceil(books.length / BOOK_PER_PAGE),
+      },
+    };
   }
 
   async getRecommendedBooks(username: string) {

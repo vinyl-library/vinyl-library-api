@@ -23,4 +23,8 @@ export class GetAllBooksQueryDto {
   @IsOptional()
   @IsString()
   stock?: string;
+
+  @IsOptional()
+  @IsNumber()
+  page?: number;
 }

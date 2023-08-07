@@ -164,7 +164,7 @@ describe('BookService', () => {
       const result = await bookService.getAllBooks({});
 
       // assert
-      expect(result).toEqual({ books: [BOOK_1, BOOK_2] });
+      expect(result.books).toEqual([BOOK_1, BOOK_2]);
     });
   });
 });
