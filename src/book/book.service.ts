@@ -55,6 +55,8 @@ export class BookService {
     genres = [],
     stock = 'available',
     page = 1,
+    sortBy = 'title',
+    orderBy = 'asc',
   }: GetAllBooksQueryDto) {
     type QueryMode = 'insensitive' | 'default';
 
@@ -104,6 +106,11 @@ export class BookService {
             name: true,
           },
         },
+      },
+      orderBy: {
+        ...(sortBy === 'title' && { title: orderBy }),
+        ...(sortBy === 'publishDate' && { publishDate: orderBy }),
+        ...(sortBy === 'rating' && { rating: orderBy }),
       },
     });
 

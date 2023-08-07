@@ -27,4 +27,12 @@ export class GetAllBooksQueryDto {
   @IsOptional()
   @IsNumber()
   page?: number;
+
+  @IsOptional()
+  @IsString()
+  sortBy?: 'title' | 'publishDate' | 'rating';
+
+  @IsOptional()
+  @IsString()
+  orderBy?: 'asc' | 'desc';
 }
