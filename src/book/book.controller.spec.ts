@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { BookController } from './book.controller';
 import { BookService } from './book.service';
 import { AddBookRequestDto } from './dto/AddBookRequest.dto';
+import { GetAllBooksQueryDto } from './dto/GetAllBooksQuery.dto';
 
 describe('BookController', () => {
   let bookController: BookController;
@@ -100,7 +101,9 @@ describe('BookController', () => {
       };
 
       // act
-      const result = await bookController.getAllBooks();
+      const result = await bookController.getAllBooks(
+        {} as GetAllBooksQueryDto,
+      );
 
       // assert
       expect(result).toEqual({ ...SUCCESS_MESSAGE, data: BOOKS });
