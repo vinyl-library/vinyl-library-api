@@ -4,6 +4,7 @@ import { AddBookRequestDto } from './dto/AddBookRequest.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { uuid } from 'uuidv4';
 import { GetAllBooksQueryDto } from './dto/GetAllBooksQuery.dto';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class BookService {
@@ -172,6 +173,50 @@ export class BookService {
 
     return {
       books,
+    };
+  }
+
+  async getBookById(bookId: string, user?: User) {
+    const book = await this.prisma.book.findFirst({
+      where: {
+        id: bookId,
+      },
+      include: {
+        genre: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    if (!book) {
+      throw new BadRequestException({ message: 'Invalid book id' });
+    }
+
+    let wishlisted = false;
+    if (!!user) {
+      const { wishlist } = await this.prisma.user.findFirst({
+        where: {
+          id: user.id,
+        },
+        select: {
+          wishlist: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      });
+
+      wishlisted = wishlist.reduce((prev, current) => {
+        return prev || current.id === bookId;
+      }, false);
+    }
+
+    return {
+      book,
+      wishlisted,
     };
   }
 }

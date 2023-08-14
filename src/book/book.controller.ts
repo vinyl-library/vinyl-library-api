@@ -50,4 +50,13 @@ export class BookController {
 
     return { message: 'Successfully get recommended books', data };
   }
+
+  @IsPublic()
+  @Get('/:bookId')
+  async getBookById(@Param('bookId') bookId: string, @Req() request: Request) {
+    const user = request.user as User;
+    const data = await this.bookService.getBookById(bookId, user);
+
+    return { message: 'Successfully get book detail', data };
+  }
 }
