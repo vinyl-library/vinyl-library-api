@@ -60,6 +60,7 @@ export class BookService {
     orderBy = 'asc',
   }: GetAllBooksQueryDto) {
     type QueryMode = 'insensitive' | 'default';
+    genres = genres.filter((genre) => genre !== '');
 
     const books = await this.prisma.book.findMany({
       where: {
