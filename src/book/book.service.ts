@@ -59,7 +59,6 @@ export class BookService {
     sortBy = 'title',
     orderBy = 'asc',
   }: GetAllBooksQueryDto) {
-    console.log(genres);
     type QueryMode = 'insensitive' | 'default';
     genres = genres.filter((genre) => genre !== '');
 
@@ -118,6 +117,7 @@ export class BookService {
     });
 
     const BOOK_PER_PAGE = 10;
+    page = Math.min(page, Math.ceil(books.length / BOOK_PER_PAGE));
     const paginated = books.slice(
       BOOK_PER_PAGE * (page - 1),
       BOOK_PER_PAGE * page,
@@ -127,7 +127,7 @@ export class BookService {
       books: paginated,
       pagination: {
         page,
-        from: BOOK_PER_PAGE * (page - 1) + 1,
+        from: Math.min(BOOK_PER_PAGE * (page - 1) + 1, books.length),
         to: Math.min(BOOK_PER_PAGE * page, books.length),
         total: books.length,
         totalPage: Math.ceil(books.length / BOOK_PER_PAGE),
