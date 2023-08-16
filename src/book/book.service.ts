@@ -117,7 +117,7 @@ export class BookService {
     });
 
     const BOOK_PER_PAGE = 10;
-    page = Math.min(page, Math.ceil(books.length / BOOK_PER_PAGE));
+    page = Math.min(page, Math.max(1, Math.ceil(books.length / BOOK_PER_PAGE)));
     const paginated = books.slice(
       BOOK_PER_PAGE * (page - 1),
       BOOK_PER_PAGE * page,
