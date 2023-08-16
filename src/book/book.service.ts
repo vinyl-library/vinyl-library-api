@@ -59,6 +59,7 @@ export class BookService {
     sortBy = 'title',
     orderBy = 'asc',
   }: GetAllBooksQueryDto) {
+    console.log(genres);
     type QueryMode = 'insensitive' | 'default';
     genres = genres.filter((genre) => genre !== '');
 

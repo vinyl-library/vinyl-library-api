@@ -28,11 +28,13 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       const request = context.switchToHttp().getRequest();
       const token = request.cookies['jwt'];
       if (!!token) {
-        const decoded = jwt.verify(
-          token,
-          this.configService.get('JWT_SECRET'),
-        ) as JwtPayload;
-        request.user = { id: decoded.sub, username: decoded.username };
+        try {
+          const decoded = jwt.verify(
+            token,
+            this.configService.get('JWT_SECRET'),
+          ) as JwtPayload;
+          request.user = { id: decoded.sub, username: decoded.username };
+        } catch (e) {}
       }
 
       return true;
