@@ -186,6 +186,7 @@ export class BookService {
       include: {
         genre: {
           select: {
+            id: true,
             name: true,
           },
         },
@@ -216,9 +217,51 @@ export class BookService {
       }, false);
     }
 
+    const bookGenre = book.genre.map((genre) => genre.id);
+    const recommendedBooks = await this.prisma.book.findMany({
+      where: {
+        id: {
+          not: bookId,
+        },
+        genre: {
+          some: {
+            id: {
+              in: bookGenre,
+            },
+          },
+        },
+      },
+      select: {
+        id: true,
+        author: true,
+        title: true,
+        rating: true,
+        coverUrl: true,
+        genre: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    recommendedBooks.sort((book1, book2) => {
+      const book1Value = book1.genre.reduce((prev, current) => {
+        return (bookGenre.includes(current.id) ? 1 : 0) + prev;
+      }, 0);
+
+      const book2Value = book2.genre.reduce((prev, current) => {
+        return (bookGenre.includes(current.id) ? 1 : 0) + prev;
+      }, 0);
+
+      return book2Value - book1Value;
+    });
+
     return {
       book,
       wishlisted,
+      recommendations: recommendedBooks.slice(0, 5),
     };
   }
 }
