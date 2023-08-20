@@ -3,10 +3,17 @@ import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 import { Observable } from 'rxjs';
 import { IS_PUBLIC_KEY } from 'src/common/decorator/isPublic';
+import * as jwt from 'jsonwebtoken';
+import { JWT_SECRET } from './jwt.constants';
+import { JwtPayload } from './jwt.interface';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
-  constructor(private reflector: Reflector) {
+  constructor(
+    private reflector: Reflector,
+    private configService: ConfigService,
+  ) {
     super();
   }
 
@@ -18,6 +25,18 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       context.getClass(),
     ]);
     if (isPublic) {
+      const request = context.switchToHttp().getRequest();
+      const token = request.cookies['jwt'];
+      if (!!token) {
+        try {
+          const decoded = jwt.verify(
+            token,
+            this.configService.get('JWT_SECRET'),
+          ) as JwtPayload;
+          request.user = { id: decoded.sub, username: decoded.username };
+        } catch (e) {}
+      }
+
       return true;
     }
     return super.canActivate(context);

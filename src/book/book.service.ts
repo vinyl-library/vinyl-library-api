@@ -4,6 +4,7 @@ import { AddBookRequestDto } from './dto/AddBookRequest.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { uuid } from 'uuidv4';
 import { GetAllBooksQueryDto } from './dto/GetAllBooksQuery.dto';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class BookService {
@@ -59,6 +60,7 @@ export class BookService {
     orderBy = 'asc',
   }: GetAllBooksQueryDto) {
     type QueryMode = 'insensitive' | 'default';
+    genres = genres.filter((genre) => genre !== '');
 
     const books = await this.prisma.book.findMany({
       where: {
@@ -115,6 +117,7 @@ export class BookService {
     });
 
     const BOOK_PER_PAGE = 10;
+    page = Math.min(page, Math.max(1, Math.ceil(books.length / BOOK_PER_PAGE)));
     const paginated = books.slice(
       BOOK_PER_PAGE * (page - 1),
       BOOK_PER_PAGE * page,
@@ -124,7 +127,7 @@ export class BookService {
       books: paginated,
       pagination: {
         page,
-        from: BOOK_PER_PAGE * (page - 1) + 1,
+        from: Math.min(BOOK_PER_PAGE * (page - 1) + 1, books.length),
         to: Math.min(BOOK_PER_PAGE * page, books.length),
         total: books.length,
         totalPage: Math.ceil(books.length / BOOK_PER_PAGE),
@@ -172,6 +175,93 @@ export class BookService {
 
     return {
       books,
+    };
+  }
+
+  async getBookById(bookId: string, user?: User) {
+    const book = await this.prisma.book.findFirst({
+      where: {
+        id: bookId,
+      },
+      include: {
+        genre: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    if (!book) {
+      throw new BadRequestException({ message: 'Invalid book id' });
+    }
+
+    let wishlisted = false;
+    if (!!user) {
+      const { wishlist } = await this.prisma.user.findFirst({
+        where: {
+          id: user.id,
+        },
+        select: {
+          wishlist: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      });
+
+      wishlisted = wishlist.reduce((prev, current) => {
+        return prev || current.id === bookId;
+      }, false);
+    }
+
+    const bookGenre = book.genre.map((genre) => genre.id);
+    const recommendedBooks = await this.prisma.book.findMany({
+      where: {
+        id: {
+          not: bookId,
+        },
+        genre: {
+          some: {
+            id: {
+              in: bookGenre,
+            },
+          },
+        },
+      },
+      select: {
+        id: true,
+        author: true,
+        title: true,
+        rating: true,
+        coverUrl: true,
+        genre: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    recommendedBooks.sort((book1, book2) => {
+      const book1Value = book1.genre.reduce((prev, current) => {
+        return (bookGenre.includes(current.id) ? 1 : 0) + prev;
+      }, 0);
+
+      const book2Value = book2.genre.reduce((prev, current) => {
+        return (bookGenre.includes(current.id) ? 1 : 0) + prev;
+      }, 0);
+
+      return book2Value - book1Value;
+    });
+
+    return {
+      book,
+      wishlisted,
+      recommendations: recommendedBooks.slice(0, 5),
     };
   }
 }
